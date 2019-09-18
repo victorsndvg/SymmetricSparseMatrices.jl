@@ -40,7 +40,7 @@ SymetriSparseMatrix getindex method implementation.
         y_= max(x,y)
         lbound=A.rowptr[x_]
         ubound=A.rowptr[x_+1]-1
-        if ubound - lbound  == 0
+        if ubound - lbound  < 0
             return zero(T)
         else 
             index = findfirst(isequal(y_), A.colval[lbound:ubound])
