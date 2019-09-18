@@ -2,6 +2,8 @@ module SymmetricSparseMatrices
 
 import Base: size, getindex, show, *
 
+export SymmetricSparseMatrix
+
 """
     SymmetricSparseMatrix{T}
 Symmetric Sparse matrix implementation.
