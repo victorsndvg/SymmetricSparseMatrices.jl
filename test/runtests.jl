@@ -1,6 +1,7 @@
-using SymmetricSparseMatrices
+module SymmetricSparseMatricesTests
+
 using Test
 
-@testset "SymmetricSparseMatrices.jl" begin
-    # Write your own tests here.
-end
+@time @testset "SymmetricSparseMatrix" begin include("SymmetricSparseMatrix/runtests.jl") end
+
+end # module
