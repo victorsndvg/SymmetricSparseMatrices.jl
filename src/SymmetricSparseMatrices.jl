@@ -8,12 +8,12 @@ Symmetric Sparse matrix implementation.
 Extension from two-dimensional arrays (or array-like types) with
 elements of type `T`. Alias for [`AbstractArray{T,2}`](@ref).
 """
-    struct SymmetricSparseMatrix{T<:Real} <: AbstractMatrix{T}
+    struct SymmetricSparseMatrix{T<:Real, I<:Integer} <: AbstractMatrix{T}
         m      ::Int                # Number of rows
         n      ::Int                # Number of columns
         nnz    ::Int                # Number of nonzero entries
-        rowptr ::Vector{<:Integer}  # Row i is in rowptr[i]:(rowptr[i+1]-1) 
-        colval ::Vector{<:Integer}  # Col indices of stored values
+        rowptr ::Vector{I}          # Row i is in rowptr[i]:(rowptr[i+1]-1) 
+        colval ::Vector{I}          # Col indices of stored values
         nzval  ::Vector{T}          # Stored values, typically nonzeros
     end # SymmetricSparseMatrix
 
@@ -34,7 +34,7 @@ SymetriSparseMatrix size method implementation.
     getindex(A::SymmetricSparseMatrix{T}, x, y) where {T<:Real}
 SymetriSparseMatrix getindex method implementation.
 """
-    function getindex(A::SymmetricSparseMatrix{T}, x, y) where {T<:Real}
+    function getindex(A::SymmetricSparseMatrix{T,I}, x::Integer, y::Integer) where {T, I}
         if !(x in 1:A.m) || !(y in 1:A.n) throw(BoundsError(string(size(A), " SymmetricSparseMatrix at index ", "[",x,",", y,"]"))) end
         x_= min(x,y)
         y_= max(x,y)
