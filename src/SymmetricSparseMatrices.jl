@@ -3,6 +3,7 @@ module SymmetricSparseMatrices
 import Base: size, getindex, show, *
 
 export SymmetricSparseMatrix
+export nnz, getindex, show, size, *
 
 """
     SymmetricSparseMatrix{T}
@@ -13,7 +14,6 @@ elements of type `T`. Alias for [`AbstractArray{T,2}`](@ref).
     struct SymmetricSparseMatrix{T<:Real, I<:Integer} <: AbstractMatrix{T}
         m      ::Int                # Number of rows
         n      ::Int                # Number of columns
-        nnz    ::Int                # Number of nonzero entries
         rowptr ::Vector{I}          # Row i is in rowptr[i]:(rowptr[i+1]-1) 
         colval ::Vector{I}          # Col indices of stored values
         nzval  ::Vector{T}          # Stored values, typically nonzeros
@@ -27,10 +27,16 @@ SymetriSparseMatrix show method implementation.
 #show(io::IO, m::MIME"text/plain", A::SymmetricSparseMatrix) = show(io::IO, A::SymmetricSparseMatrix) 
 
 """
-    size(A::SymmetricSparseMatrix) = (A.m, A.n)
+    size(A::SymmetricSparseMatrix)
 SymetriSparseMatrix size method implementation.
 """
     size(A::SymmetricSparseMatrix) = (A.m, A.n)
+
+"""
+    nnz(A::SymmetricSparseMatrix)
+Returns the number of stored (filled) elements in a sparse array.
+"""
+    nnz(A::SymmetricSparseMatrix) = A.rowptr[end]-1
 
 """
     getindex(A::SymmetricSparseMatrix{T}, x, y) where {T<:Real}
