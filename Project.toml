@@ -3,6 +3,9 @@ uuid = "05127f78-d533-11e9-247e-fd7d09ecf029"
 authors = ["Víctor Sande Veiga", "International Centre for Numerical Methods in Engineering"]
 version = "0.1.0"
 
+[deps]
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
 [compat]
 julia = "1"
 

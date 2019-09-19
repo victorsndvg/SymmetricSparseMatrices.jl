@@ -1,9 +1,12 @@
 module SymmetricSparseMatrices
 
 import Base: size, getindex, show, *
+import SparseArrays: nnz, sparse
 
 export SymmetricSparseMatrix
-export nnz, getindex, show, size, *
+export nnz, getindex, show, size, symsparse, *
+
+using SparseArrays
 
 """
     SymmetricSparseMatrix{T<:Real, I<:Integer}
@@ -29,17 +32,66 @@ elements of type `T` and `I`. Alias for [`AbstractArray{T,2}`](@ref).
     SymmetricSparseMatrix(m::Integer, n::Integer, rowptr::Vector, colval::Vector, nzval::Vector)
 SymetricSparseMatrix outter constructor method with full signature.
 """
-function SymmetricSparseMatrix(m::Integer, n::Integer, rowptr::Vector, colval::Vector, nzval::Vector)
-    Tv = eltype(nzval)
-    Ti = promote_type(eltype(rowptr), eltype(colval))
-    SymmetricSparseMatrix{Tv,Ti}(m, n, rowptr, colval, nzval)
-end
+    function SymmetricSparseMatrix(m::Integer, n::Integer, rowptr::Vector, colval::Vector, nzval::Vector)
+        Tv = eltype(nzval)
+        Ti = promote_type(eltype(rowptr), eltype(colval))
+        SymmetricSparseMatrix{Tv,Ti}(m, n, rowptr, colval, nzval)
+    end
 
 """
     SymmetricSparseMatrix()
 SymetricSparseMatrix outter constructor method to create empty .
 """
-SymmetricSparseMatrix() = SymmetricSparseMatrices.SymmetricSparseMatrix(0,0,[1],Vector{Int}(),Vector{Int}())
+    SymmetricSparseMatrix() = SymmetricSparseMatrix(0,0,[1],Vector{Int}(),Vector{Int}())
+
+
+"""
+    convertCOOrowstoCSR(m, I)
+Convert ordered COO rows (I) to CSR rowptr given its number of rows.
+"""
+    function convertCOOrowstoCSR(m, I)
+        rowptr=zeros(eltype(I), m+1)
+        previ=1
+        counter=0
+        j=1
+        rowptr[1]=1
+        for i in I
+            counter+=1
+            if i!=previ
+                j+=1
+                rowptr[j] = counter
+                counter+=0
+                previ = i
+            end
+        end
+        rowptr[m+1]=counter+1
+        return rowptr
+    end
+
+"""
+    symsparse(S::SparseMatrixCSC{T,Ti}) where {T, Ti}
+Convert SparseMatrixCSC{T,Ti} to SymmetricSparseMatrix.
+"""
+    function symsparse(S::SparseMatrixCSC{T,Ti}) where {T, Ti}
+        m = S.m                     # Number of rows
+        n = S.n                     # Number of columns
+
+        for i in 1:min(m,n) setindex!(S, getindex(S, i, i), i, i) end
+
+        # Sort by rows
+        I,J,K = findnz(S)
+        permutation = sortperm(I)
+
+        # Return SymmetricSparseMatrix CSR
+        return SymmetricSparseMatrix(m, n, convertCOOrowstoCSR(m, I[permutation]), J[permutation], K[permutation])
+    end
+
+"""
+    symsparse(A::AbstractMatrix{Tv}) where {Tv}
+Convert AbstractMatrix{Tv} to SymmetricSparseMatrix.
+"""
+    symsparse(A::AbstractMatrix{Tv}) where {Tv} = symsparse(convert(SparseMatrixCSC{Tv,Int}, A))
+
 
 """
     show(io::IO, A::SymmetricSparseMatrix)
