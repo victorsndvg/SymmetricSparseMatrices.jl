@@ -19,5 +19,5 @@ using Test
     a = sparse([1,2,3,4,1,2,3,4],[1,2,3,4,4,3,2,1],[1,2,3,4,4,3,2,1])
     b = Matrix(a)
     c = symsparse(b)
-    @ test a != c != b
+    @test a != c != b
 end
